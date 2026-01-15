@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学習ログ送信アプリ</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background-color: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #333; text-align: center; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        #status { margin-top: 15px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📝 学習ログ送信</h2>
+    <input type="text" id="name" placeholder="お名前" required>
+    <textarea id="message" placeholder="今日のひとこと" rows="3"></textarea>
+    <input type="password" id="password" placeholder="合言葉" required>
+    <button onclick="sendData()" id="submitBtn">送信する</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    async function sendData() {
+        const btn = document.getElementById("submitBtn");
+        const status = document.getElementById("status");
+        
+        // --- ここに取得したGASのURLを貼り付けてください ---
+        const url = https://script.google.com/macros/s/AKfycbyJcWg_IoSL7x90GmzzC1wozJKz7P2XbtSSZRcj8obzv96HpcjDlAIMsCjgPVFIMAZ4fQ/exec;
+
+        const payload = {
+            name: document.getElementById("name").value,
+            message: document.getElementById("message").value,
+            password: document.getElementById("password").value
+        };
+
+        if(!payload.name || !payload.password) {
+            alert("名前と合言葉は必須です！");
+            return;
+        }
+
+        btn.disabled = true;
+        status.innerText = "送信中...";
+        status.style.color = "blue";
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                mode: "no-cors", // GASへのPOSTの制約上、応答は不透明になります
+                body: JSON.stringify(payload)
+            });
+
+            // no-corsモードでは詳細なレスポンスが取れないため、成功とみなしてリセット
+            status.innerText = "送信完了！スプレッドシートを確認してください。";
+            status.style.color = "green";
+            document.getElementById("message").value = "";
+            document.getElementById("password").value = "";
+
+        } catch (error) {
+            status.innerText = "エラーが発生しました。";
+            status.style.color = "red";
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
