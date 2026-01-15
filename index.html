@@ -30,8 +30,8 @@
         const btn = document.getElementById("submitBtn");
         const status = document.getElementById("status");
         
-        // --- ここに取得したGASのURLを貼り付けてください ---
-        const url = https://script.google.com/macros/s/AKfycbyJcWg_IoSL7x90GmzzC1wozJKz7P2XbtSSZRcj8obzv96HpcjDlAIMsCjgPVFIMAZ4fQ/exec;
+        // --- 自分のURLに書き換えてください ---
+        const url = "ここに最新のGASのURLを貼り付け";
 
         const payload = {
             name: document.getElementById("name").value,
@@ -40,23 +40,22 @@
         };
 
         if(!payload.name || !payload.password) {
-            alert("名前と合言葉は必須です！");
+            alert("名前と合言葉を入れてください");
             return;
         }
 
         btn.disabled = true;
-        status.innerText = "送信中...";
-        status.style.color = "blue";
+        status.innerText = "通信を開始します...";
 
         try {
-            const response = await fetch(url, {
+            // GASへデータを送信（no-corsモード）
+            await fetch(url, {
                 method: "POST",
-                mode: "no-cors", // GASへのPOSTの制約上、応答は不透明になります
+                mode: "no-cors",
                 body: JSON.stringify(payload)
             });
 
-            // no-corsモードでは詳細なレスポンスが取れないため、成功とみなしてリセット
-            status.innerText = "送信完了！スプレッドシートを確認してください。";
+            status.innerText = "送信完了！シートを確認してください。";
             status.style.color = "green";
             document.getElementById("message").value = "";
             document.getElementById("password").value = "";
@@ -64,6 +63,7 @@
         } catch (error) {
             status.innerText = "エラーが発生しました。";
             status.style.color = "red";
+            alert("エラー: " + error.message);
         } finally {
             btn.disabled = false;
         }
@@ -72,4 +72,3 @@
 
 </body>
 </html>
-
